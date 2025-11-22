@@ -19,7 +19,7 @@
     document.getElementById('tripForm').onsubmit = async (e) => {
       e.preventDefault();
       const userQuery = document.getElementById('userQuery').value;
-      const res = await fetch('https://YOUR-RENDER-APP.onrender.com/plan', {
+      const res = await fetch('https://inkle-assignment-ai-intern-1frv.onrender.com/plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userQuery })
