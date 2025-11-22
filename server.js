@@ -6,7 +6,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('Welcome! This is the Tourism AI assignment backend.<br><br>To plan a trip, send a POST request to /plan with JSON body: { "userQuery": "Your trip question" }.<br><br>Use Postman, curl, or a frontend for best results!');
+  res.send('Welcome! This is the Tourism AI assignment backend.<br><br>');
 });
 
 app.post('/plan', async (req, res) => {
