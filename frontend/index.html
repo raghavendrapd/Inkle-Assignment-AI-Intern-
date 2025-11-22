@@ -6,19 +6,28 @@
 </head>
 <body>
   <h1>Tourism AI Planner</h1>
+
   <p id="renderAlert">
-  Note: The backend is hosted on Render and may take up to 30 seconds to respond if it has been inactive. Please wait if there is a delay.
-</p>
+    Note: The backend is hosted on Render and may take up to 30 seconds to respond if it has been inactive.<br>
+    Please wait if there is a delay.
+  </p>
+
+  <p></p> 
 
   <form id="tripForm">
     <label>
-      Input:
+      Input:<br>
       <input type="text" id="userQuery" required placeholder="E.g. I’m going to go to Bangalore, let’s plan my trip.">
     </label>
-    <br>
-    <button type="submit">Plan Trip</button>
+    <p></p> 
+    <button type="submit">
+      Plan Trip
+    </button>
   </form>
+
+  <p></p> 
   <div id="result"></div>
+
   <script>
     document.getElementById('tripForm').onsubmit = async (e) => {
       e.preventDefault();
