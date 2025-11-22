@@ -19,7 +19,7 @@
     document.getElementById('tripForm').onsubmit = async (e) => {
       e.preventDefault();
       const userQuery = document.getElementById('userQuery').value;
-      const res = await fetch('https://probable-space-eureka-jjg9jvv5956525j5x-4000.app.github.dev/plan', {
+      const res = await fetch('https://YOUR-RENDER-APP.onrender.com/plan', {  // <--- Change this line!
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userQuery })
