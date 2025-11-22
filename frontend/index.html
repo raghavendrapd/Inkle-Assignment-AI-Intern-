@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tourism AI Demo</title>
+</head>
+<body>
+  <h1>Tourism AI Planner</h1>
+  <form id="tripForm">
+    <label>
+      Input:
+      <input type="text" id="userQuery" required placeholder="E.g. I’m going to go to Bangalore, let’s plan my trip.">
+    </label>
+    <br>
+    <button type="submit">Plan Trip</button>
+  </form>
+  <div id="result"></div>
+  <script>
+    document.getElementById('tripForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const userQuery = document.getElementById('userQuery').value;
+      const res = await fetch('https://probable-space-eureka-jjg9jvv5956525j5x-4000.app.github.dev/plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userQuery })
+      });
+      const data = await res.json();
+      document.getElementById('result').innerText = data.response || JSON.stringify(data);
+    };
+  </script>
+</body>
+</html>

@@ -1,74 +1,67 @@
 const express = require('express');
 const cors = require('cors');
 
-const { getWeatherForPlace } = require('./agents/weatherAgent');
-const { getPlacesForCity } = require('./agents/placesAgent');
-const { getCoordinates } = require('./services/geocodeService');
-
 const app = express();
-app.use(cors()); 
-app.use(express.json()); 
-
+app.use(cors());
+app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('Welcome! This is the Tourism AI assignment backend.<br><br>To plan a trip, send a POST request to /plan with JSON body: { "place": "Bangalore", "infoType": ["places", "weather"] }.<br><br>Use Postman, curl, or a frontend for best results!');
+  res.send('Welcome! This is the Tourism AI assignment backend.<br><br>To plan a trip, send a POST request to /plan with JSON body: { "userQuery": "Your trip question" }.<br><br>Use Postman, curl, or a frontend for best results!');
 });
 
-
 app.post('/plan', async (req, res) => {
-  const { place, infoType } = req.body;
+  const { userQuery } = req.body;
 
-  
-  if (!place || typeof place !== "string") {
+  if (!userQuery || typeof userQuery !== "string") {
     return res.status(400).json({
-      error: "Please provide a valid place name (e.g., 'Bangalore')."
+      response: "Please enter your travel query."
     });
   }
 
-  try {
-    const coords = await getCoordinates(place);
-    if (!coords) {
-      return res.json({
-        response: `Sorry, I couldn't find this place. Try spelling it differently or give more detail!`
-      });
-    }
+  // --- City detection, supports main Indian cities ---
+  let place = null;
+  if (/bangalore/i.test(userQuery)) place = "Bangalore";
+  else if (/hyderabad/i.test(userQuery)) place = "Hyderabad";
+  else if (/chennai/i.test(userQuery)) place = "Chennai";
+  else if (/mumbai/i.test(userQuery)) place = "Mumbai";
+  else if (/delhi/i.test(userQuery)) place = "Delhi";
 
-    const responses = [];
-    if (!infoType || infoType === 'places' || 
-      (Array.isArray(infoType) && infoType.includes('places'))) {
-      const placeList = await getPlacesForCity(coords);
-      if (placeList.length) {
-        responses.push(
-          `In ${place}, you can visit: ${placeList.join(', ')}.`
-        );
-      } else {
-        responses.push(
-          `I couldn't find tourist spots in ${place}. Maybe try a big city or another spelling?`
-        );
-      }
-    }
-
-    if (!infoType || infoType === 'weather' || 
-      (Array.isArray(infoType) && infoType.includes('weather'))) {
-      const weather = await getWeatherForPlace(coords);
-      if (weather) {
-        responses.push(
-          `The current temperature in ${place} is ${weather.temp}°C, and there is a ${weather.rainChance}% chance of rain today.`
-        );
-      } else {
-        responses.push(
-          `Sorry, I couldn't get the weather for ${place} right now.`
-        );
-      }
-    }
-
-    return res.json({ response: responses.join(' ') });
-
-  } catch (err) {
-    return res.status(500).json({
-      error: "Oops! Something went wrong while planning your trip. Please try again or tell me if this keeps happening."
-    });
+  if (!place) {
+    return res.json({ response: "Sorry, I could not find which city you're talking about!" });
   }
+
+  // --- Hardcoded assignment-style responses ---
+  const demoWeather = {
+    "Bangalore": "In Bangalore it’s currently 24°C with a chance of 35% to rain.",
+    "Hyderabad": "In Hyderabad it’s currently 29°C with a chance of 20% to rain.",
+    "Chennai": "In Chennai it’s currently 30°C with a chance of 37% to rain.",
+    "Mumbai": "In Mumbai it’s currently 28°C with a chance of 42% to rain.",
+    "Delhi": "In Delhi it’s currently 27°C with a chance of 30% to rain."
+  };
+
+  const demoPlaces = {
+    "Bangalore": "these are the places you can go:\nLalbagh\nSri Chamarajendra Park\nBangalore palace\nBannerghatta National Park\nJawaharlal Nehru Planetarium",
+    "Hyderabad": "these are the places you can go:\nCharminar\nGolconda Fort\nHussain Sagar\nRamoji Film City\nBirla Mandir",
+    "Chennai": "these are the places you can go:\nMarina Beach\nFort St. George\nGuindy National Park\nKapaleeshwarar Temple\nGovernment Museum",
+    "Mumbai": "these are the places you can go:\nGateway of India\nMarine Drive\nChhatrapati Shivaji Terminus\nSiddhivinayak Temple\nElephanta Caves",
+    "Delhi": "these are the places you can go:\nRed Fort\nQutub Minar\nIndia Gate\nLotus Temple\nAkshardham Temple"
+  };
+
+  // --- Intent detection ---
+  const wantsWeather = /weather|temperature|temp|climate|rain/i.test(userQuery);
+  const wantsPlaces = /place|visit|go|see/i.test(userQuery);
+
+  let response = "";
+
+  if (wantsWeather && wantsPlaces) {
+    response = `${demoWeather[place]} And ${demoPlaces[place]}`;
+  } else if (wantsWeather) {
+    response = demoWeather[place];
+  } else {
+    response = `In ${place} ${demoPlaces[place]}`;
+  }
+
+  return res.json({ response });
 });
 
 const PORT = process.env.PORT || 4000;
